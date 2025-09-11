@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# launch setup in background
+# Launch background setup
 /usr/local/bin/background.sh >/tmp/setup.log 2>&1 & disown
 
-echo "Scenario is loading... please wait."
-for i in $(seq 1 120); do
+msg="Installing Nginx (this can take a bit)"
+dots=""
+echo -n "$msg"
+
+# Loop until ready file exists
+for i in $(seq 1 180); do
   if [[ -f /tmp/.scenario_ready ]]; then
-    echo "✅ Setup complete!"
+    echo -e "\r✅ $msg ... Done!"
     exit 0
   fi
-  printf "."
+  dots="${dots}."
+  printf "\r%s %s" "$msg" "$dots"
   sleep 1
 done
 
-echo "⚠️ Setup took too long. Please reload the scenario."
+echo -e "\n⚠️ Setup took too long. Please reload the scenario."
 exit 1

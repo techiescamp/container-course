@@ -2,5 +2,8 @@
 set -euo pipefail
 exec >>/tmp/setup.log 2>&1
 
-sleep 30   # simulate long setup
+# simulate a long setup
+sleep 25
+
+# e.g. apt-get update && apt-get install -y nginx
 touch /tmp/.scenario_ready
