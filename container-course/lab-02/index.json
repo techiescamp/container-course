@@ -4,14 +4,20 @@
   "details": {
     "intro": {
       "text": "docs/intro.md",
-      "courseData": "scripts/background.sh",
-      "foreground": "scripts/foreground.sh"
+      "courseData": "/usr/local/bin/background.sh",
+      "foreground": "/usr/local/bin/foreground.sh"
     },
     "steps": [
-      { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md" },
-      { "title": "Step 2: Process Tree", "text": "docs/step2.md" }
+      { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md", "verify": "scripts/validate.sh" },
+      { "title": "Step 2: Process Tree", "text": "docs/step2.md", "verify": "scripts/validate.sh" }
     ],
     "finish": { "text": "docs/finish.md" }
   },
-  "backend": { "imageid": "ubuntu" }
+  "backend": { "imageid": "ubuntu" },
+  "assets": {
+    "host01": [
+      { "file": "scripts/background.sh", "target": "/usr/local/bin/background.sh", "chmod": "+x" },
+      { "file": "scripts/foreground.sh", "target": "/usr/local/bin/foreground.sh", "chmod": "+x" }
+    ]
+  }
 }
