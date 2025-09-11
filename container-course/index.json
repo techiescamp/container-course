@@ -1,6 +1,0 @@
-{
-  "title": "Docker Playground",
-  "backend": {
-    "imageid": "ubuntu"
-  }
-}

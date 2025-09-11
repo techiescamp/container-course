@@ -1,0 +1,11 @@
+{
+    "title": "Container Course Labs",
+    "description": "Hands-on labs to learn containerization and orchestration concepts.",
+    "items": [
+      { 
+        "path": "Lab-01",
+        "title": "Lab 01: Nginx Process",
+        "description": "🎯 In this lab, you will learn about the Nginx process model, including the parent and child processes."
+      }      
+    ]
+  }
