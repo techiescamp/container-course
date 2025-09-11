@@ -3,4 +3,5 @@
 To see the process tree format, run:
 
 ```bash
-pstree -p
+pstree -p -s $(pgrep -o nginx)
+```
