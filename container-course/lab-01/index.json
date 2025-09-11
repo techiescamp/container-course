@@ -3,7 +3,8 @@
     "description": "Learn the parent and child process model of Nginx.",
     "details": {
       "intro": {
-        "text": "docs/intro.md"
+        "text": "docs/intro.md",
+        "courseData": "scripts/background.sh"
       },
       "steps": [
         {
