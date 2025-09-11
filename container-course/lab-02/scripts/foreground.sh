@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# /usr/local/bin/foreground.sh
+set +xv   # make sure no command echoing
+tput civis || true
+trap 'tput cnorm >/dev/null 2>&1 || true' EXIT
 
-# Start the long job in the background
-/usr/local/bin/background.sh &
-
-echo ""
+echo
 echo "Scenario is loading... please wait."
-echo ""
+echo
 
-# Wait until the background job drops a ready file
 for i in $(seq 1 120); do
   if [[ -f /tmp/.scenario_ready ]]; then
+    echo
     echo "Setup complete!"
     exit 0
   fi
@@ -18,6 +18,6 @@ for i in $(seq 1 120); do
   sleep 1
 done
 
-echo ""
-echo "Setup took too long. Please reload the scenario."
+echo
+echo "Setup is taking longer than expected. Please reload the scenario."
 exit 1

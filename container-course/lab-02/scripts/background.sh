@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
+# /usr/local/bin/background.sh
 set -euo pipefail
+exec >>/tmp/setup.log 2>&1
 
-# Example long task (replace with your real setup)
+# your real setup
 sleep 30
+# e.g. apt-get update && apt-get install -y nginx
 
-# Do your real provisioning here...
-# apt-get update && apt-get install -y nginx
-# kubectl apply -f something.yaml
-# etc.
-
-# Signal readiness
 touch /tmp/.scenario_ready
