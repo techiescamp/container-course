@@ -1,17 +1,24 @@
 {
   "title": "Lab 01: Nginx Process",
   "description": "Learn the parent and child process model of Nginx.",
+  "backend": { "imageid": "ubuntu" },
+  "environment": { "uilayout": "terminal" },
+
   "details": {
-    "intro": {
-      "text": "docs/intro.md",
-      "courseData": "bash -lc 'scripts/background.sh >/tmp/setup.log 2>&1 & disown'",
-      "foreground": "bash -lc 'chmod +x scripts/foreground.sh && scripts/foreground.sh'"
-    },
+    "intro": { "text": "docs/intro.md" },
     "steps": [
-      { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md", "verify": "scripts/validate.sh" },
-      { "title": "Step 2: Process Tree", "text": "docs/step2.md", "verify": "scripts/validate.sh" }
+      { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md" },
+      { "title": "Step 2: Process Tree", "text": "docs/step2.md"}
     ],
     "finish": { "text": "docs/finish.md" }
   },
-  "backend": { "imageid": "ubuntu" }
+
+  "assets": {
+    "host01": [
+      { "file": "scripts/background.sh", "target": "/usr/local/bin/background.sh", "chmod": "+x" },
+      { "file": "scripts/foreground.sh", "target": "/usr/local/bin/foreground.sh", "chmod": "+x" }
+    ]
+  },
+
+  "start": "bash -lc /usr/local/bin/foreground.sh"
 }
