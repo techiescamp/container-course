@@ -1,18 +1,23 @@
 {
-  "title": "My Scenario",
-  "description": "Loads, then starts",
-  "backend": { "imageid": "ubuntu:2004" },
+  "title": "Lab 01: Nginx Process",
+  "description": "Learn the parent and child process model of Nginx.",
   "details": {
+    "intro": {
+      "text": "docs/intro.md",
+      "courseData": "bash -lc /usr/local/bin/background.sh",
+      "foreground": "bash -lc 'script -qec /usr/local/bin/foreground.sh /dev/null'"
+    },
     "steps": [
-      { "title": "Welcome", "text": "step1.md" }
-    ]
+      { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md", "verify": "scripts/validate.sh" },
+      { "title": "Step 2: Process Tree", "text": "docs/step2.md", "verify": "scripts/validate.sh" }
+    ],
+    "finish": { "text": "docs/finish.md" }
   },
-  "environment": { "uilayout": "terminal" },
+  "backend": { "imageid": "ubuntu" },
   "assets": {
     "host01": [
-      { "file": "background.sh", "target": "/usr/local/bin/background.sh", "chmod": "+x" },
-      { "file": "foreground.sh", "target": "/usr/local/bin/foreground.sh", "chmod": "+x" }
+      { "file": "scripts/background.sh", "target": "/usr/local/bin/background.sh", "chmod": "+x" },
+      { "file": "scripts/foreground.sh", "target": "/usr/local/bin/foreground.sh", "chmod": "+x" }
     ]
-  },
-  "start": "bash /usr/local/bin/foreground.sh"
+  }
 }
