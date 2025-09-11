@@ -8,7 +8,7 @@
     "intro": { "text": "docs/intro.md" },
     "steps": [
       { "title": "Step 1: Check Nginx Process", "text": "docs/step1.md" },
-      { "title": "Step 2: Process Tree", "text": "docs/step2.md"}
+      { "title": "Step 2: Process Tree", "text": "docs/step2.md" }
     ],
     "finish": { "text": "docs/finish.md" }
   },
