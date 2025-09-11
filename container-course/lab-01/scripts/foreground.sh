@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Wait for nginx to start
-sleep 5
+sleep 15
 
 # Check if nginx is running
 if systemctl is-active --quiet nginx; then
