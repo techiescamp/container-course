@@ -1,0 +1,27 @@
+{
+    "title": "Lab 01: Nginx Process",
+    "description": "Learn the parent and child process model of Nginx.",
+    "details": {
+      "intro": {
+        "text": "docs/intro.md"
+      },
+      "steps": [
+        {
+            "title": "Step 1: Check Nginx Process",
+            "text": "docs/step1.md",
+            "verify": "scripts/validate.sh"
+        }, 
+        {
+            "title": "Step 1: Process Tree",
+            "text": "docs/step2.md",
+            "verify": "scripts/validate.sh"
+        }
+      ],
+      "finish": {
+        "text": "docs/finish.md"
+      }
+    },
+    "backend": {
+      "imageid": "ubuntu"
+    }
+}
