@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 echo "Scenario is loading... please wait."
 for i in $(seq 1 120); do
-  if [[ -f /tmp/.scenario_ready ]]; then
-    echo "Setup complete!"
-    exit 0
-  fi
+  [[ -f /tmp/.scenario_ready ]] && echo "Setup complete!" && exit 0
   printf "."
   sleep 1
 done

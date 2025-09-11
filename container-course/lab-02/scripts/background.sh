@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec >>/tmp/setup.log 2>&1
-
-# long setup here
+# simulate long setup (replace with real work)
 sleep 30
-
 touch /tmp/.scenario_ready
