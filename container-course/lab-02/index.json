@@ -1,0 +1,18 @@
+{
+  "title": "My Scenario",
+  "description": "Loads, then starts",
+  "backend": { "imageid": "ubuntu:2004" },
+  "details": {
+    "steps": [
+      { "title": "Welcome", "text": "step1.md" }
+    ]
+  },
+  "environment": { "uilayout": "terminal" },
+  "assets": {
+    "host01": [
+      { "file": "background.sh", "target": "/usr/local/bin/background.sh", "chmod": "+x" },
+      { "file": "foreground.sh", "target": "/usr/local/bin/foreground.sh", "chmod": "+x" }
+    ]
+  },
+  "start": "bash /usr/local/bin/foreground.sh"
+}
