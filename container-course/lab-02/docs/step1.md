@@ -1,5 +1,6 @@
-# Welcome
+### Step 1: Check Nginx Processes
 
-The scenario prepares the environment when it starts.
+Check the Nginx processes:
 
-You will see **Scenario is loading...** in the terminal. Once setup is done, you can continue.
+```bash
+ps -ef | grep [n]ginx
