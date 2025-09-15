@@ -10,8 +10,7 @@
       "steps": [
         {
             "title": "Step 1: Check Nginx Process",
-            "text": "docs/step1.md",
-            "verify": "scripts/validate.sh"
+            "text": "docs/step1.md"
         }
       ],
       "finish": {
