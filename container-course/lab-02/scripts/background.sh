@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec >>/tmp/setup.log 2>&1
 
 # simulate a long setup
 echo "Starting background setup..." >/dev/tty
