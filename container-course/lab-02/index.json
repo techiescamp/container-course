@@ -4,8 +4,7 @@
     "details": {
       "intro": {
         "text": "docs/intro.md",
-        "courseData": "scripts/background.sh",
-        "foreground": "scripts/foreground.sh"
+        "courseData": "scripts/background.sh"
       },
       "steps": [
         {
