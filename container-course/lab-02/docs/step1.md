@@ -9,7 +9,7 @@ To install Nginx, use the following command:
 ```bash
 sudo apt update
 sudo apt install nginx -y
-````{{exec}}
+```{{exec}}
 
 Once the installation is completed, use the following command to see the Nginx's parent (master) and the child (worker) processes:
 
@@ -38,7 +38,7 @@ www-data  2133  2130  0 12:10 ?        00:00:00 nginx: worker process
 To see the process in a tree format:
 
 ```bash
-pstree -p
+pstree -p -s $(pgrep -o nginx)
 ```{{exec}}
 
 ### Example Output

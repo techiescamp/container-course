@@ -1,8 +1,5 @@
 #!/bin/bash
 
-echo "Starting background setup..." >/dev/tty
-sleep 25
-
 sudo apt update -y
 sudo apt install -y nginx
 sudo systemctl start nginx
