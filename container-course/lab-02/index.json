@@ -5,7 +5,8 @@
       "intro": {
         "text": "docs/intro.md",
         "background": "scripts/background.sh",
-        "foreground": "scripts/foreground.sh"
+        "foreground": "scripts/foreground.sh",
+        "init": "scripts/init.sh"
       },
       "steps": [
         {
