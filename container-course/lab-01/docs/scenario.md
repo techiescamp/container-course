@@ -31,7 +31,7 @@ The explanation of the above output is.
 * **Master process (PID 2130)** runs as root and manages the worker processes.
 * **Worker processes (PID 2132, 2133)** run as `www-data` to handle client requests.
 
-> **Note:** If a server uses **systemd**, it will be the very first process started when the system boots, because its PID is **1**.
+> **Note:** On servers that use systemd, it is the first process that starts at boot, its PID is **1**.
 
 ## View Process Tree
 
