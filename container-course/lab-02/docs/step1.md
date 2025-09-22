@@ -25,7 +25,7 @@ www-data  2132  2130  0 12:10 ?        00:00:00 nginx: worker process
 www-data  2133  2130  0 12:10 ?        00:00:00 nginx: worker process
 ```
 
-### Explanation
+The explanation of the above output is.
 
 * The **third column** is the **Parent Process ID (PPID)**, and the **second column** is the **Process ID (PID)**.
 * **Master process (PID 2130)** runs as root and manages the worker processes.
@@ -45,8 +45,8 @@ pstree -p -s $(pgrep -o nginx)
 
 ```text
 systemd(1)─┬─nginx(2130)─┬─nginx(2132)
-           │             └─nginx(2133)
-           └─sshd(900)───bash(1200)───pstree(2200)
+                         └─nginx(2133)
+           
 ```
 
 Here, **systemd** is the root parent process of the Ubuntu server, so the PID is **1**.
