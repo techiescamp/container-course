@@ -11,6 +11,11 @@
         "path": "lab-02",
         "title": "Lab 01: Nginx Process",
         "description": "🎯 In this lab, you will learn about the Nginx process model, including the parent and child processes."
+      },
+      { 
+        "path": "lab-03",
+        "title": "Lab 03: Demo scenario",
+        "description": "🎯 In this lab, you will learn about the Nginx process model, including the parent and child processes."
       }      
     ]
   }
