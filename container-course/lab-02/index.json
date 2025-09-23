@@ -10,7 +10,7 @@
       "steps": [
         {
             "title": "Check Network Namespaces",
-            "text": "docs/step1.md"
+            "text": "docs/scenario.md"
         }
       ],
       "finish": {
