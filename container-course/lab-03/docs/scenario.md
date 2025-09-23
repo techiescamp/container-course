@@ -8,7 +8,7 @@ To understand cgroups practically, we will create a process, limit its CPU and m
 
 On Ubuntu/Debian:
 
-````bash
+```bash
 sudo apt update
 sudo apt install cgroup-tools -y
 ```{{copy}}
@@ -75,13 +75,13 @@ sudo yum install stress -y   # RHEL/CentOS
 stress: info: [2683] dispatching hogs: 0 cpu, 0 io, 1 vm, 0 hdd
 stress: FAIL: [2683] (415) <-- worker 2684 got signal 9
 stress: WARN: [2683] (417) now reaping child worker processes
-````
+```
 
 ---
 
 ## Step 6: Run a CPU Test in the cgroup
 
-````bash
+```bash
 sudo cgexec -g memory,cpu:labgroup stress --cpu 1 --timeout 20s
 ```{{copy}}
 
