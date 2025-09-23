@@ -9,6 +9,11 @@ To understand Linux network namespaces in a hands-on way, we will create namespa
 ```bash
 sudo ip netns add ns1
 sudo ip netns add ns2
+```{{exec}}
+
+List the created Namespaces
+
+```bash
 ip netns list
 ```{{exec}}
 
