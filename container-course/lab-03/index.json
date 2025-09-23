@@ -1,0 +1,23 @@
+{
+    "title": "Lab 02: Linux Control Groups (cgroups)",
+    "description": "Learn about Linux control groups (cgroups).",
+    "details": {
+      "intro": {
+        "text": "docs/intro.md",
+        "background": "scripts/background.sh",
+        "foreground": "scripts/foreground.sh"
+      },
+      "steps": [
+        {
+            "title": "Check Control Groups",
+            "text": "docs/scenario.md"
+        }
+      ],
+      "finish": {
+        "text": "docs/finish.md"
+      }
+    },
+    "backend": {
+      "imageid": "ubuntu"
+    }
+}

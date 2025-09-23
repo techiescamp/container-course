@@ -14,8 +14,8 @@
       },
       { 
         "path": "lab-03",
-        "title": "Lab 03: Demo scenario",
-        "description": "🎯 In this lab, you will learn about the Nginx process model, including the parent and child processes."
+        "title": "Lab 03: Linux Control Groups (cgroups)",
+        "description": "🎯 In this lab, you will learn about Linux control groups (cgroups)."
       }      
     ]
   }
