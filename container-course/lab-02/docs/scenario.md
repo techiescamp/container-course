@@ -47,7 +47,9 @@ A **veth pair** works like a cable. Anything sent into one end comes out of the 
 ```bash
 sudo ip link set veth1 netns ns1
 sudo ip link set veth2 netns ns2
+```{{copy}}
 
+```bash
 sudo ip netns exec ns1 ip link
 sudo ip netns exec ns2 ip link
 ```{{copy}}
@@ -58,7 +60,6 @@ sudo ip netns exec ns2 ip link
 3: veth2@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default
 ```
 
-**Explanation:**
 Now, `veth1` is inside `ns1` and `veth2` is inside `ns2`. Each namespace has its own "network card."
 
 ---
@@ -70,7 +71,6 @@ sudo ip netns exec ns1 ip addr add 10.0.0.1/24 dev veth1
 sudo ip netns exec ns2 ip addr add 10.0.0.2/24 dev veth2
 ```{{copy}}
 
-**Explanation:**  
 Assigning IP addresses lets the namespaces talk over Layer 3 (IP). Both are placed in the same subnet `10.0.0.0/24`.
 
 ---
@@ -85,7 +85,6 @@ sudo ip netns exec ns2 ip link set lo up
 sudo ip netns exec ns2 ip link set veth2 up
 ```{{copy}}
 
-**Explanation:**  
 Interfaces are down by default. Bringing them up is necessary for communication. Loopback (`lo`) is also enabled because many tools expect it.
 
 ---
@@ -103,7 +102,6 @@ sudo ip netns exec ns2 ip route
 10.0.0.0/24 dev veth2 proto kernel scope link src 10.0.0.2
 ```
 
-**Explanation:**
 The kernel automatically installs a route for each subnet when IPs are assigned. This shows both namespaces know how to reach each other.
 
 ---
@@ -125,7 +123,6 @@ PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
 3 packets transmitted, 3 received, 0% packet loss, time 2045ms
 ```
 
-**Explanation:**
 This confirms connectivity between the namespaces. The first ping also performs ARP resolution to learn the MAC address of the peer.
 
 ---
@@ -141,25 +138,10 @@ sudo ip netns exec ns1 ip neigh
 10.0.0.2 dev veth1 lladdr 9a:02:88:4c:2f:3a REACHABLE
 ```
 
-**Explanation:**
 The ARP table shows how `10.0.0.2` is mapped to its MAC address over `veth1`.
 
 ---
 
-## Cleanup
-
-When done, delete the namespaces and interfaces:
-
-```bash
-sudo ip netns del ns1
-sudo ip netns del ns2
-```{{copy}}
-
-**Explanation:**  
-Always clean up lab resources so they don’t interfere with other experiments.
-
----
-
-✅ **You have successfully created and managed Linux network namespaces, connected them with veth pairs, assigned IPs, and tested connectivity!**
+**You have successfully created and managed Linux network namespaces, connected them with veth pairs, assigned IPs, and tested connectivity!**
 
 ---
