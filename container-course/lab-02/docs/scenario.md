@@ -6,7 +6,7 @@ To understand Linux network namespaces in a hands-on way, we will create namespa
 
 ## Step 1: Create Two Network Namespaces
 
-````bash
+```bash
 sudo ip netns add ns1
 sudo ip netns add ns2
 ip netns list
@@ -16,7 +16,7 @@ ip netns list
 ```text
 ns2
 ns1
-````
+```
 
 **Explanation:**
 A **network namespace** is like a separate networking world inside your host. Each namespace has its own interfaces, routing table, and ARP table. Here we created `ns1` and `ns2`.
@@ -25,7 +25,7 @@ A **network namespace** is like a separate networking world inside your host. Ea
 
 ## Step 2: Create a Virtual Ethernet (veth) Pair
 
-````bash
+```bash
 sudo ip link add veth1 type veth peer name veth2
 ip link show veth1
 ip link show veth2
@@ -35,7 +35,7 @@ ip link show veth2
 ```text
 5: veth1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default
 6: veth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default
-````
+```
 
 **Explanation:**
 A **veth pair** works like a cable. Anything sent into one end comes out of the other. We will attach each end to a different namespace.
@@ -44,7 +44,7 @@ A **veth pair** works like a cable. Anything sent into one end comes out of the 
 
 ## Step 3: Assign veth Interfaces to Namespaces
 
-````bash
+```bash
 sudo ip link set veth1 netns ns1
 sudo ip link set veth2 netns ns2
 
@@ -56,7 +56,7 @@ sudo ip netns exec ns2 ip link
 ```text
 3: veth1@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default
 3: veth2@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default
-````
+```
 
 **Explanation:**
 Now, `veth1` is inside `ns1` and `veth2` is inside `ns2`. Each namespace has its own "network card."
@@ -65,7 +65,7 @@ Now, `veth1` is inside `ns1` and `veth2` is inside `ns2`. Each namespace has its
 
 ## Step 4: Assign IP Addresses
 
-````bash
+```bash
 sudo ip netns exec ns1 ip addr add 10.0.0.1/24 dev veth1
 sudo ip netns exec ns2 ip addr add 10.0.0.2/24 dev veth2
 ```{{exec}}
@@ -101,7 +101,7 @@ sudo ip netns exec ns2 ip route
 ```text
 10.0.0.0/24 dev veth1 proto kernel scope link src 10.0.0.1
 10.0.0.0/24 dev veth2 proto kernel scope link src 10.0.0.2
-````
+```
 
 **Explanation:**
 The kernel automatically installs a route for each subnet when IPs are assigned. This shows both namespaces know how to reach each other.
@@ -110,7 +110,7 @@ The kernel automatically installs a route for each subnet when IPs are assigned.
 
 ## Step 7: Test Connectivity
 
-````bash
+```bash
 sudo ip netns exec ns1 ping -c 3 10.0.0.2
 ```{{exec}}
 
@@ -123,7 +123,7 @@ PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
 
 --- 10.0.0.2 ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 2045ms
-````
+```
 
 **Explanation:**
 This confirms connectivity between the namespaces. The first ping also performs ARP resolution to learn the MAC address of the peer.
@@ -132,14 +132,14 @@ This confirms connectivity between the namespaces. The first ping also performs 
 
 ## Step 8 (Optional): Check ARP Table
 
-````bash
+```bash
 sudo ip netns exec ns1 ip neigh
 ```{{exec}}
 
 ### Example Output
 ```text
 10.0.0.2 dev veth1 lladdr 9a:02:88:4c:2f:3a REACHABLE
-````
+```
 
 **Explanation:**
 The ARP table shows how `10.0.0.2` is mapped to its MAC address over `veth1`.
@@ -150,7 +150,7 @@ The ARP table shows how `10.0.0.2` is mapped to its MAC address over `veth1`.
 
 When done, delete the namespaces and interfaces:
 
-````bash
+```bash
 sudo ip netns del ns1
 sudo ip netns del ns2
 ```{{exec}}
