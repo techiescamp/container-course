@@ -1,3 +1,4 @@
+```
 test -f /sys/fs/cgroup/cgroup.controllers && echo "cgroups v2" || echo "cgroups v1"
 ```{{copy}}
 
@@ -167,4 +168,3 @@ sudo rmdir /sys/fs/cgroup/labgroup
 - **Set limits** (memory, CPU share, CPU quota, PIDs)  
 - **Attach processes** and **verify** with the live counters/files
 
-If you want, I can add an **I/O throttling mini-lab** (read/write bandwidth cap) in the same style.
