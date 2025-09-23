@@ -1,123 +1,170 @@
-# Hands-On Guide: Linux Control Groups (cgroups)
-
-To understand cgroups practically, we will create a process, limit its CPU and memory usage using cgroups, and observe the effects.
+test -f /sys/fs/cgroup/cgroup.controllers && echo "cgroups v2" || echo "cgroups v1"
+```{{copy}}
 
 ---
 
-## Step 1: Install cgroup Tools (if not already installed)
+## Track A — Using `systemd-run` (recommended)
 
-On Ubuntu/Debian:
-
+### A1) Install a load tool
 ```bash
 sudo apt update
-sudo apt install cgroup-tools -y
+sudo apt install -y stress
 ```{{copy}}
 
-The `cgroup-tools` (or `libcgroup`) package provides commands like `cgcreate`, `cgexec`, and `cgset` that help us manage cgroups easily.
-
----
-
-## Step 2: Create a cgroup
-
+### A2) Create a cgroup and set **memory limit**
+Creates a transient cgroup (scope), runs a process, and caps memory.
 ```bash
-sudo cgcreate -g memory,cpu:/labgroup
+sudo systemd-run --unit=lab-mem --scope \
+  -p MemoryMax=100M \
+  stress --vm 1 --vm-bytes 200M --vm-hang 60
 ```{{copy}}
 
-This creates a new cgroup named `labgroup` that can control both **memory** and **CPU** usage. The path `/sys/fs/cgroup/` will now have a `labgroup` directory.
-
----
-
-## Step 3: Set CPU Limit
-
+**What happens:** process tries 200 MB; cgroup allows 100 MB → OOM kill (signal 9).  
+**Verify logs:**
 ```bash
-sudo cgset -r cpu.shares=256 labgroup
+journalctl -u lab-mem.scope -n 50 --no-pager
 ```{{copy}}
 
-- `cpu.shares` controls the relative CPU allocation.  
-- Default is `1024`. Setting it to `256` means the process in this group gets **about 1/4 CPU share** compared to normal processes.
-
----
-
-## Step 4: Set Memory Limit
-
+**See raw cgroup files (paths may vary slightly):**
 ```bash
-sudo cgset -r memory.limit_in_bytes=100M labgroup
-```{{copy}}
-
-This limits any process in the `labgroup` cgroup to **100 MB of RAM**. If it exceeds, the kernel’s OOM (Out-of-Memory) killer will terminate it.
-
----
-
-## Step 5: Run a Process in the cgroup
-
-Let’s run a memory-hungry program (Python script) under this cgroup.
-
-```bash
-sudo cgexec -g memory,cpu:labgroup stress --vm 1 --vm-bytes 200M --vm-hang 60
-```{{copy}}
-
-> Install `stress` if not available:
-```bash
-sudo apt install stress -y   # Debian/Ubuntu
-```{{copy}}
-
-- `stress --vm 1 --vm-bytes 200M` tries to allocate **200 MB memory**.  
-- Since our cgroup limit is **100 MB**, the kernel will kill this process.  
-
-### Example Output
-```text
-stress: info: [2683] dispatching hogs: 0 cpu, 0 io, 1 vm, 0 hdd
-stress: FAIL: [2683] (415) <-- worker 2684 got signal 9
-stress: WARN: [2683] (417) now reaping child worker processes
-```
-
----
-
-## Step 6: Run a CPU Test in the cgroup
-
-```bash
-sudo cgexec -g memory,cpu:labgroup stress --cpu 1 --timeout 20s
-```{{copy}}
-
-**Explanation:**  
-This runs a CPU-intensive process for 20 seconds. Because `cpu.shares=256`, it gets less CPU compared to other processes on the system.
-
-You can observe CPU usage with:
-
-```bash
-top
+systemd-cgls --unit lab-mem.scope
+cat /sys/fs/cgroup/system.slice/lab-mem.scope/memory.max
+cat /sys/fs/cgroup/system.slice/lab-mem.scope/memory.current
 ```{{copy}}
 
 ---
 
-## Step 7: Inspect cgroup Stats
-
+### A3) Create a cgroup and set **CPU share (relative)**
 ```bash
-cat /sys/fs/cgroup/memory/labgroup/memory.max_usage_in_bytes
-cat /sys/fs/cgroup/cpu/labgroup/cpu.shares
+sudo systemd-run --unit=lab-cpu --scope \
+  -p CPUWeight=200 \
+  stress --cpu 1 --timeout 20s
 ```{{copy}}
 
-These files show the **actual maximum memory used** and the **CPU share configuration**.
-
----
-
-## Step 8: Clean Up
-
+- Default weight is **100**. Higher = more share, lower = less.
+- Check applied property:
 ```bash
-sudo cgdelete -g memory,cpu:/labgroup
+systemctl show -p CPUWeight lab-cpu.scope
+cat /sys/fs/cgroup/system.slice/lab-cpu.scope/cpu.weight
+cat /sys/fs/cgroup/system.slice/lab-cpu.scope/cpu.stat
 ```{{copy}}
 
-Removes the cgroup and frees system resources.
+---
+
+### A4) (Optional) **Hard CPU cap** (quota) instead of share  
+`CPUQuota=` sets a percentage of one CPU.
+```bash
+sudo systemd-run --unit=lab-cap --scope \
+  -p CPUQuota=50% \
+  stress --cpu 1 --timeout 20s
+```{{copy}}
+
+Verify:
+```bash
+systemctl show -p CPUQuotaPerSecUSec lab-cap.scope
+cat /sys/fs/cgroup/system.slice/lab-cap.scope/cpu.max
+```{{copy}}
 
 ---
 
-## Summary
+### A5) (Optional) **PIDs limit** (number of processes)
+```bash
+sudo systemd-run --unit=lab-pids --scope \
+  -p TasksMax=10 \
+  bash -c 'sleep 30'
+```{{copy}}
 
-- **cgroups** let you control how much CPU, memory, and other resources processes can use.  
-- You created a `labgroup` cgroup, limited its CPU shares and memory.  
-- Running stress tests showed how limits get enforced (OOM kill for memory, throttling for CPU).  
+Verify:
+```bash
+systemctl show -p TasksMax lab-pids.scope
+cat /sys/fs/cgroup/system.slice/lab-pids.scope/pids.max
+```{{copy}}
 
 ---
 
-Now you’ve learned to **create, configure, and test cgroups in Linux**
+### A6) Stop anything left running
+```bash
+sudo systemctl stop lab-mem.scope lab-cpu.scope lab-cap.scope lab-pids.scope 2>/dev/null || true
+```{{copy}}
 
+---
+
+## Track B — Low-level cgroup v2 (learn the internals)
+
+> Note: On systemd distros, direct writes under `/sys/fs/cgroup` may be restricted. These steps usually work with `sudo`. If you get **Permission denied**, prefer **Track A**.
+
+### B1) Create your own cgroup
+```bash
+sudo mkdir -p /sys/fs/cgroup/labgroup
+```{{copy}}
+
+**(If controllers are not enabled at parent, try enabling at root — may be blocked by systemd):**
+```bash
+# Enable controllers we’ll use (ignore if this errors)
+echo "+memory +cpu +pids" | sudo tee -a /sys/fs/cgroup/cgroup.subtree_control
+```{{copy}}
+
+### B2) Set limits in that cgroup
+- **Memory limit** (strict cap):
+```bash
+echo 100M | sudo tee /sys/fs/cgroup/labgroup/memory.max
+```{{copy}}
+
+- **CPU share** (relative weight, 1–10000; default 100):
+```bash
+echo 200 | sudo tee /sys/fs/cgroup/labgroup/cpu.weight
+```{{copy}}
+
+- **Hard CPU cap** (quota/period): format `max` or `<quota> <period>`
+```bash
+echo "50000 100000" | sudo tee /sys/fs/cgroup/labgroup/cpu.max   # = 50% of 1 CPU
+```{{copy}}
+
+- **PIDs limit** (max processes/threads):
+```bash
+echo 50 | sudo tee /sys/fs/cgroup/labgroup/pids.max
+```{{copy}}
+
+### B3) Run a process and **move it** into the cgroup
+Start some workload, grab its PID, then attach:
+```bash
+stress --vm 1 --vm-bytes 200M --vm-hang 60 & pid=$!
+echo $pid | sudo tee /sys/fs/cgroup/labgroup/cgroup.procs
+wait $pid || true
+```{{copy}}
+
+**Expected:** it gets killed by OOM due to `memory.max=100M`.
+
+### B4) Verify live stats
+```bash
+cat /sys/fs/cgroup/labgroup/memory.max
+cat /sys/fs/cgroup/labgroup/memory.current
+cat /sys/fs/cgroup/labgroup/cpu.weight
+cat /sys/fs/cgroup/labgroup/cpu.stat
+cat /sys/fs/cgroup/labgroup/pids.current
+```{{copy}}
+
+### B5) Clean up the cgroup
+```bash
+sudo rmdir /sys/fs/cgroup/labgroup
+```{{copy}}
+
+---
+
+## Quick Reference (v2 keys you actually need)
+
+- **CPU (relative share):** `cpu.weight` (1–10000, default 100)  
+- **CPU (hard cap):** `cpu.max` (`max` or `<quota> <period>`; default period 100000 µs)  
+- **Memory cap:** `memory.max` (bytes or `max` for unlimited)  
+- **Current memory:** `memory.current`  
+- **Processes limit:** `pids.max` / current `pids.current`  
+- **I/O throttle (advanced):** `io.max` (e.g., `8:0 rbps=1048576 wbps=1048576`)
+
+---
+
+### What you learned
+- **Create** a cgroup (scope via systemd or directory via cgroupfs)  
+- **Set limits** (memory, CPU share, CPU quota, PIDs)  
+- **Attach processes** and **verify** with the live counters/files
+
+If you want, I can add an **I/O throttling mini-lab** (read/write bandwidth cap) in the same style.
