@@ -1,6 +1,6 @@
 {
-    "title": "Lab 02: Nginx Process",
-    "description": "Learn the parent and child process model of Nginx.",
+    "title": "Lab 02: Linux Network Namespaces",
+    "description": "Learn about Linux network namespaces.",
     "details": {
       "intro": {
         "text": "docs/intro.md",
@@ -9,7 +9,7 @@
       },
       "steps": [
         {
-            "title": "Check Nginx Process",
+            "title": "Check Network Namespaces",
             "text": "docs/step1.md"
         }
       ],

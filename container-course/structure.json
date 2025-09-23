@@ -9,8 +9,8 @@
       },
       { 
         "path": "lab-02",
-        "title": "Lab 01: Nginx Process",
-        "description": "🎯 In this lab, you will learn about the Nginx process model, including the parent and child processes."
+        "title": "Lab 02: Linux Network Namespaces",
+        "description": "🎯 In this lab, you will learn about Linux network namespaces."
       },
       { 
         "path": "lab-03",
