@@ -33,6 +33,8 @@ A **network namespace** is like a separate networking world inside your host. Ea
 sudo ip link add veth1 type veth peer name veth2
 ```{{copy}}
 
+Verify both interfaces are created
+
 ```bash
 ip link show veth1
 ip link show veth2
