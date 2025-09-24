@@ -33,8 +33,11 @@ This creates a new cgroup named `labgroup` that can control both **memory** and 
 sudo cgset -r cpu.max="20000 100000" labgroup   # ~20% of one CPU
 ```{{copy}}
 
-- `cpu.shares` controls the relative CPU allocation.  
-- Default is `1024`. Setting it to `256` means the process in this group gets **about 1/4 CPU share** compared to normal processes.
+- PERIOD = 100000 microseconds = 100 ms
+- QUOTA = 20000 microseconds = 20 ms
+
+In every 100 ms window, processes in labgroup are allowed to run only 20 ms of CPU time.
+That is the same as 20% of one CPU core. If you try to use more, Linux pauses (throttles) them until the next 100 ms window starts.
 
 ---
 
@@ -87,11 +90,6 @@ cat /sys/fs/cgroup/labgroup/memory.events
 sudo cgexec -g cpu,memory:labgroup bash -c 'timeout 10s sh -c "while :; do :; done"'
 ```{{copy}}
 
-## Watch the effect
-```bash
-cat /sys/fs/cgroup/labgroup/cpu.stat
-```{{copy}}
-
 Runs a tight loop for 10s inside the cgroup. With cpu.max="20000 100000" (20ms every 100ms → ~20% CPU of one core), the loop should get throttled.
 
 Example output:
@@ -104,7 +102,10 @@ nr_periods 100
 nr_throttled 80
 throttled_usec 8000000
 ```
-
+## Watch the effect
+```bash
+cat /sys/fs/cgroup/labgroup/cpu.stat
+```{{copy}}
 ---
 
  Now you’ve learned to **create, configure, and test cgroups in Linux**
