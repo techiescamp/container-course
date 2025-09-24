@@ -92,6 +92,11 @@ sudo cgexec -g cpu,memory:labgroup bash -c 'timeout 10s sh -c "while :; do :; do
 
 Runs a tight loop for 10s inside the cgroup. With cpu.max="20000 100000" (20ms every 100ms → ~20% CPU of one core), the loop should get throttled.
 
+## Watch the effect
+```bash
+cat /sys/fs/cgroup/labgroup/cpu.stat
+```{{copy}}
+
 Example output:
 
 ```bash
@@ -102,10 +107,6 @@ nr_periods 100
 nr_throttled 80
 throttled_usec 8000000
 ```
-## Watch the effect
-```bash
-cat /sys/fs/cgroup/labgroup/cpu.stat
-```{{copy}}
 ---
 
  Now you’ve learned to **create, configure, and test cgroups in Linux**
