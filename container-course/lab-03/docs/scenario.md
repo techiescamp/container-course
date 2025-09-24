@@ -30,7 +30,7 @@ This creates a new cgroup named `labgroup` that can control both **memory** and 
 ## Step 3: Set CPU Limit
 
 ```bash
-sudo cgset -r cpu.weight=25 labgroup
+sudo cgset -r cpu.max="20000 100000" labgroup   # ~20% of one CPU
 ```{{copy}}
 
 - `cpu.shares` controls the relative CPU allocation.  
@@ -46,6 +46,13 @@ sudo cgset -r memory.max=100M labgroup
 
 This limits any process in the `labgroup` cgroup to **100 MB of RAM**. If it exceeds, the kernel’s OOM (Out-of-Memory) killer will terminate it.
 
+Verify the values setup for both
+
+```bash
+cat /sys/fs/cgroup/labgroup/memory.max
+cat /sys/fs/cgroup/labgroup/cpu.max
+```{{copy}}
+
 ---
 
 ## Step 5: Run a test process inside the cgroup 
@@ -53,14 +60,26 @@ This limits any process in the `labgroup` cgroup to **100 MB of RAM**. If it exc
 Let’s run a memory-hungry program (Python script) under this cgroup.
 
 ```bash
-sudo cgexec -g cpu,memory:labgroup \
-  bash -c 'stress-ng --vm 1 --vm-bytes 200M --timeout 20s || true'
+sudo cgexec -g cpu,memory:labgroup python3 - <<'PY'
+import time
+chunks = [bytearray(1024*1024) for _ in range(200)]  # ~200 MB
+time.sleep(20)
+PY
 ```{{copy}}
 
 ## Watch the effect
+```bash
 cat /sys/fs/cgroup/labgroup/memory.current
 cat /sys/fs/cgroup/labgroup/memory.events
-cat /sys/fs/cgroup/labgroup/cpu.sta
+cat /sys/fs/cgroup/labgroup/cpu.stat
+```{{copy}}
+
+## Test the CPU throttling
+
+```bash
+sudo cgexec -g cpu,memory:labgroup bash -c 'timeout 10s sh -c "while :; do :; done"'
+cat /sys/fs/cgroup/labgroup/cpu.stat
+```{{copy}}
 
 ---
 
