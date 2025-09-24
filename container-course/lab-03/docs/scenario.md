@@ -67,19 +67,43 @@ time.sleep(20)
 PY
 ```{{copy}}
 
+Runs a Python script inside the labgroup cgroup. It tries to allocate ~200 MB. If your memory.max is 100M, this should hit the memory limit and get OOM-killed.
+
+If it hits the limit quickly, you may see:
+
+```bash
+Killed
+```
+
 ## Watch the effect
 ```bash
 cat /sys/fs/cgroup/labgroup/memory.current
 cat /sys/fs/cgroup/labgroup/memory.events
-cat /sys/fs/cgroup/labgroup/cpu.stat
 ```{{copy}}
 
 ## Test the CPU throttling
 
 ```bash
 sudo cgexec -g cpu,memory:labgroup bash -c 'timeout 10s sh -c "while :; do :; done"'
+```{{copy}}
+
+## Watch the effect
+```bash
 cat /sys/fs/cgroup/labgroup/cpu.stat
 ```{{copy}}
+
+Runs a tight loop for 10s inside the cgroup. With cpu.max="20000 100000" (20ms every 100ms → ~20% CPU of one core), the loop should get throttled.
+
+Example output:
+
+```bash
+usage_usec 3100000
+user_usec 3050000
+system_usec 50000
+nr_periods 100
+nr_throttled 80
+throttled_usec 8000000
+```
 
 ---
 
