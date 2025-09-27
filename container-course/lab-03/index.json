@@ -2,6 +2,10 @@
     "title": "Lab 02: Linux Control Groups (cgroups)",
     "description": "Learn about Linux control groups (cgroups).",
     "details": {
+      "intro": {
+        "text": "docs/scenario.md",
+        "background": "scripts/background.sh"
+      },
       "steps": [
         {
             "title": "Check Control Groups",
