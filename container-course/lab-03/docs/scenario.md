@@ -1,105 +1,121 @@
 # Hands-On Guide: Linux Control Groups (cgroups)
 
-To understand cgroups practically, we will create a process, limit its CPU and memory usage using cgroups, and observe the effects.
+In this lab, you’ll learn how **Linux Control Groups (cgroups)** work by creating a group, applying CPU and memory limits, and observing how processes behave under those restrictions.
+
+By the end of this exercise, you’ll understand how cgroups form the foundation for container resource management in systems like Docker and Kubernetes.
 
 ---
 
-## Step 1: Install cgroup Tools (if not already installed)
+## Step 1: Install Required Tools
 
-On Ubuntu/Debian:
+On Ubuntu, install the cgroup utilities and a stress-testing tool:
 
 ```bash
 sudo apt update
-sudo apt install cgroup-tools -y && apt install -y stress-ng
-```{{copy}}
+sudo apt install -y cgroup-tools
+```{{copy}}  
 
-The `cgroup-tools` (or `libcgroup`) package provides commands like `cgcreate`, `cgexec`, and `cgset` that help us manage cgroups easily.
+- **cgroup-tools (libcgroup)** provides commands like `cgcreate`, `cgexec`, and `cgset` for managing cgroups.  
+- **stress-ng** is useful for simulating CPU and memory load.  
 
 ---
 
-## Step 2: Create a cgroup
+## Step 2: Create a Cgroup  
 
 ```bash
 sudo cgcreate -g cpu,memory:/labgroup
-```{{copy}}
+```{{copy}}  
 
-This creates a new cgroup named `labgroup` that can control both **memory** and **CPU** usage. The path `/sys/fs/cgroup/` will now have a `labgroup` directory.
+This creates a new cgroup called **labgroup** with CPU and memory controllers enabled.  
+A directory `/sys/fs/cgroup/labgroup/` will now exist to track and control resources.  
 
 ---
 
-## Step 3: Set CPU Limit
+## Step 3: Apply CPU Limit  
 
 ```bash
-sudo cgset -r cpu.max="20000 100000" labgroup   # ~20% of one CPU
-```{{copy}}
+sudo cgset -r cpu.max="20000 100000" labgroup
+```{{copy}}  
 
-- PERIOD = 100000 microseconds = 100 ms
-- QUOTA = 20000 microseconds = 20 ms
+- **PERIOD = 100000 µs (100 ms)**  
+- **QUOTA = 20000 µs (20 ms)**  
 
-In every 100 ms window, processes in labgroup are allowed to run only 20 ms of CPU time.
-That is the same as 20% of one CPU core. If you try to use more, Linux pauses (throttles) them until the next 100 ms window starts.
+This means processes inside `labgroup` can only run for **20 ms every 100 ms**, which is ~20% of a single CPU core.  
+
+If a process tries to use more, the kernel **throttles** it until the next scheduling window.  
 
 ---
 
-## Step 4: Set Memory Limit
+## Step 4: Apply Memory Limit  
 
 ```bash
 sudo cgset -r memory.max=100M labgroup
-```{{copy}}
+```{{copy}}  
 
-This limits any process in the `labgroup` cgroup to **100 MB of RAM**. If it exceeds, the kernel’s OOM (Out-of-Memory) killer will terminate it.
+This restricts processes in `labgroup` to **100 MB of RAM**.  
+If memory usage goes beyond this, the kernel’s **OOM (Out-of-Memory) killer** terminates the process.  
 
-Verify the values setup for both
+Verify the limits:  
 
 ```bash
 cat /sys/fs/cgroup/labgroup/memory.max
 cat /sys/fs/cgroup/labgroup/cpu.max
-```{{copy}}
+```{{copy}}  
 
 ---
 
-## Step 5: Run a test process inside the cgroup 
+## Step 5: Run a Test Process  
 
-Let’s run a memory-hungry program (Python script) under this cgroup.
+Let’s run a memory-hungry Python script inside the cgroup:  
 
 ```bash
 sudo cgexec -g cpu,memory:labgroup python3 - <<'PY'
 import time
-chunks = [bytearray(1024*1024) for _ in range(200)]  # ~200 MB
+chunks = [bytearray(1024*1024) for _ in range(200)]  # Allocate ~200 MB
 time.sleep(20)
 PY
-```{{copy}}
+```{{copy}}  
 
-Runs a Python script inside the labgroup cgroup. It tries to allocate ~200 MB. If your memory.max is 100M, this should hit the memory limit and get OOM-killed.
+- Since we limited memory to **100 MB**, this script (200 MB allocation) should trigger the OOM killer.  
+- You’ll likely see:  
 
-If it hits the limit quickly, you may see:
-
-```bash
+```text
 Killed
 ```
 
-## Watch the effect
+---
+
+## Step 6: Observe Memory Usage
+
+Check current memory consumption and events:
+
 ```bash
 cat /sys/fs/cgroup/labgroup/memory.current
 cat /sys/fs/cgroup/labgroup/memory.events
-```{{copy}}
+```{{copy}}  
 
-## Test the CPU throttling
+---
+
+## Step 7: Test CPU Throttling  
+
+Run a CPU-intensive process inside the cgroup:  
 
 ```bash
 sudo cgexec -g cpu,memory:labgroup bash -c 'timeout 10s sh -c "while :; do :; done"'
-```{{copy}}
+```{{copy}}  
 
-Runs a tight loop for 10s inside the cgroup. With cpu.max="20000 100000" (20ms every 100ms → ~20% CPU of one core), the loop should get throttled.
+This infinite loop tries to consume 100% CPU for 10 seconds.  
+Because of the CPU limit (`20% of one core`), it will be throttled.  
 
-## Watch the effect
+Check stats:  
+
 ```bash
 cat /sys/fs/cgroup/labgroup/cpu.stat
-```{{copy}}
+```{{copy}}  
 
-Example output:
+Example output:  
 
-```bash
+```text
 usage_usec 3100000
 user_usec 3050000
 system_usec 50000
@@ -107,7 +123,13 @@ nr_periods 100
 nr_throttled 80
 throttled_usec 8000000
 ```
+
+* `nr_throttled`: How many times processes were throttled.
+* `throttled_usec`: Total time processes spent waiting due to CPU limits.
+
 ---
 
- Now you’ve learned to **create, configure, and test cgroups in Linux**
+You’ve now learned how to **create a cgroup, apply CPU and memory limits, and monitor their effects**.
+This hands-on experiment shows exactly how Linux enforces resource controls—essential knowledge for understanding containers.
+
 
