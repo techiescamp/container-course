@@ -3,7 +3,7 @@
     "description": "Learn about Linux control groups (cgroups).",
     "details": {
       "intro": {
-        "text": "docs/scenario.md",
+        "text": "docs/intro.md",
         "background": "scripts/background.sh"
       },
       "steps": [
