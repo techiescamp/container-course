@@ -3,17 +3,8 @@
     "description": "Learn about Linux control groups (cgroups).",
     "details": {
       "intro": {
-        "text": "docs/intro.md",
+        "text": "docs/scenario.md",
         "background": "scripts/background.sh"
-      },
-      "steps": [
-        {
-            "title": "Check Control Groups",
-            "text": "docs/scenario.md"
-        }
-      ],
-      "finish": {
-        "text": "docs/finish.md"
       }
     },
     "backend": {
