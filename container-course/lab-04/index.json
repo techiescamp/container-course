@@ -1,0 +1,22 @@
+{
+    "title": "Lab 04: Docker images layers",
+    "description": "Learn the Docker image layers using Nginx.",
+    "details": {
+      "intro": {
+        "text": "docs/intro.md",
+        "background": "scripts/background.sh"
+      },
+      "steps": [
+        {
+            "title": "Check Nginx Process",
+            "text": "docs/scenario.md"
+        }
+      ],
+      "finish": {
+        "text": "docs/finish.md"
+      }
+    },
+    "backend": {
+      "imageid": "ubuntu"
+    }
+}

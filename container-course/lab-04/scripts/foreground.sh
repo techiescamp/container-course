@@ -1,0 +1,1 @@
+echo Hello and welcome to this scenario!

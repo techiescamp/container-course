@@ -16,6 +16,11 @@
         "path": "lab-03",
         "title": "Lab 03: Linux Control Groups (cgroups)",
         "description": "🎯 In this lab, you will learn about Linux control groups (cgroups)."
-      }      
+      },
+      { 
+        "path": "lab-04",
+        "title": "Lab 04: Docker Image Layers",
+        "description": "🎯 In this lab, you will learn about Docker image layers."
+      }       
     ]
   }
