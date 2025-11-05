@@ -158,8 +158,8 @@ dive nginx
 
 You will see an interactive terminal with multiple panels showing:
 
-<p style="text-align: center;">
-  <img src="image.png" width="700">
+<p align="center">
+  <img src="../assets/image.png" width="700">
 </p>
 
 ### Interface Components

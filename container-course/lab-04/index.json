@@ -8,7 +8,7 @@
       },
       "steps": [
         {
-            "title": "Check Nginx Process",
+            "title": "Check Docker image layers",
             "text": "docs/scenario.md"
         }
       ],
