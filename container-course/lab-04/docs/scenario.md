@@ -53,18 +53,6 @@ Pick one of the layer directories and examine its contents:
 sudo ls -la /var/lib/docker/overlay2/$(sudo ls /var/lib/docker/overlay2 | head -1)
 ```{{exec}}
 
-### Layer Directory Structure
-
-```text
-.
-├── committed          # Marks this layer as finalized
-├── diff/              # Contains actual file changes in this layer
-│   └── docker-entrypoint.sh
-├── link               # Short internal reference name
-├── lower              # Points to parent layer dependencies
-└── work/              # Temporary workspace for OverlayFS merging
-```
-
 **Key Components:**
 - **diff/** - Contains actual file changes in this layer
 - **link** - Short internal name Docker uses as a reference of this layer
